@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap');
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #f2f4f8;
+  font-family: 'Montserrat', Arial, sans-serif;
+  min-height: 100vh;
+}
+
+.bg-gradient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(circle at 60% 20%, #dbeafe 0%, #b4b7c9 100%);
+  width: 100vw;
+  height: 100vh;
+  filter: blur(0.5px);
+}
+
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.register-form {
+  background: rgba(255,255,255,0.85);
+  padding: 2.5rem 2rem 2rem 2rem;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(33,150,243,0.10);
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.register-form h1 {
+  text-align: center;
+  color: #1976d2;
+  margin-bottom: 1.2rem;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.input-group label {
+  font-weight: 700;
+  color: #444;
+  margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.04rem;
+}
+
+.input-group input,
+.input-group select {
+  padding: 0.7rem 1rem;
+  border-radius: 7px;
+  border: 1.5px solid #e0e0e0;
+  font-size: 1rem;
+  background: #f9f9f9;
+  transition: border 0.2s;
+  color: #333;
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  border: 1.5px solid #2196f3;
+  background: #fff;
+  outline: none;
+}
+
+.register-btn {
+  background: linear-gradient(90deg, #2196f3 0%, #1976d2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 0.8rem 0;
+  font-size: 1.09rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 0.7rem;
+  box-shadow: 0 2px 8px rgba(33,150,243,0.07);
+  transition: background 0.2s;
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.register-btn:hover {
+  background: linear-gradient(90deg, #1976d2 0%, #2196f3 100%);
+}
+
+.signin-link {
+  text-align: center;
+  font-size: 0.98rem;
+  color: #555;
+  margin-top: 0.8rem;
+}
+.signin-link a {
+  color: #2196f3;
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.2s;
+}
+.signin-link a:hover {
+  color: #1769aa;
+}
+
+@media (max-width: 600px) {
+  .register-form {
+    padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+    max-width: 98vw;
+  }
+}
