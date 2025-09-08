@@ -1,8 +1,9 @@
+// Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
-// Your web app's Firebase configuration
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDp3Ud5V45D60_-uZYPw2Y9hbqoZg7erlo",
   authDomain: "expense-tracker-1085e.firebaseapp.com",
@@ -18,6 +19,7 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
 
+// Handle login form submission
 document.getElementById('loginForm').addEventListener("submit", function(event){
   event.preventDefault();
 
@@ -32,9 +34,10 @@ document.getElementById('loginForm').addEventListener("submit", function(event){
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       alert("Signed in successfully!");
-      window.location.href = "/Frontend/Dashboard/test.html"; // or your dashboard page
+      // ✅ Redirect after successful login
+      window.location.href = "/frontend/gamepage.html";
     })
     .catch((error) => {
-      alert(error.message);
+      alert("Login failed: " + error.message);
     });
 });

@@ -1,447 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hectoc Puzzle</title>
-  <style>
-    :root {
-      --primary: rgba(156, 39, 176, 0.8);
-      --primary-solid: #9c27b0;
-      --secondary: rgba(0, 188, 212, 0.8);
-      --text: rgba(255, 255, 255, 0.9);
-      --text-secondary: rgba(255, 255, 255, 0.7);
-      --glass: rgba(255, 255, 255, 0.1);
-      --glass-border: rgba(255, 255, 255, 0.15);
-      --glass-highlight: rgba(255, 255, 255, 0.2);
-      --correct: rgba(76, 175, 80, 0.8);
-      --incorrect: rgba(244, 67, 54, 0.8);
-      --spacing: 1.5rem;
-      --border-radius: 16px;
-      --blur: 16px;
-      --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      color: var(--text);
-      background: url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=3000') center/cover no-repeat fixed;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: var(--spacing);
-    }
-
-    .glass {
-      background: var(--glass);
-      backdrop-filter: blur(var(--blur));
-      -webkit-backdrop-filter: blur(var(--blur));
-      border-radius: var(--border-radius);
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 4px 12px var(--glass-highlight);
-    }
-
-    .game-container {
-      width: 100%;
-      max-width: 480px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .game-header {
-      padding: var(--spacing);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .game-title {
-      font-size: 1.8rem;
-      font-weight: 700;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 1px;
-    }
-
-    .profile-btn {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      padding: 0.5rem;
-      border-radius: 50px;
-      transition: var(--transition);
-    }
-
-    .profile-btn:hover {
-      background: var(--glass-highlight);
-    }
-
-    .avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: 600;
-      color: white;
-    }
-
-    .puzzle-display {
-      padding: var(--spacing);
-      margin-bottom: var(--spacing);
-      display: flex;
-      justify-content: center;
-    }
-
-    .digits {
-      display: flex;
-      gap: 0.5rem;
-      font-size: 0;
-    }
-
-    .digit {
-      font-size: 2rem;
-      font-weight: 600;
-      color: white;
-      width: 50px;
-      height: 70px;
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 8px;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      transition: var(--transition);
-    }
-
-    .solution-container {
-      position: relative;
-      margin-bottom: var(--spacing);
-    }
-
-    .solution-input {
-      width: 100%;
-      padding: 1.2rem;
-      font-size: 1.2rem;
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--border-radius);
-      color: white;
-      text-align: center;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      transition: var(--transition);
-    }
-
-    .solution-input::placeholder {
-      color: var(--text-secondary);
-    }
-
-    .solution-input:focus {
-      outline: none;
-      background: rgba(255, 255, 255, 0.2);
-      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
-    }
-
-    .submit-btn {
-      width: 100%;
-      padding: 1.2rem;
-      font-size: 1.1rem;
-      font-weight: 600;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      border: none;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      transition: var(--transition);
-      box-shadow: 0 4px 20px rgba(156, 39, 176, 0.3);
-      letter-spacing: 0.5px;
-    }
-
-    .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(156, 39, 176, 0.4);
-    }
-
-    .feedback {
-      min-height: 1.5rem;
-      text-align: center;
-      margin-top: 1rem;
-      font-weight: 500;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: var(--transition);
-    }
-
-    .feedback.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .correct {
-      color: var(--correct);
-      text-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
-    }
-
-    .incorrect {
-      color: var(--incorrect);
-      text-shadow: 0 2px 4px rgba(244, 67, 54, 0.2);
-    }
-
-    .profile-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: var(--transition);
-      z-index: 100;
-      padding: var(--spacing);
-    }
-
-    .profile-modal.active {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .profile-content {
-      width: 100%;
-      max-width: 400px;
-      padding: var(--spacing);
-      transform: translateY(20px);
-      transition: var(--transition);
-    }
-
-    .profile-modal.active .profile-content {
-      transform: translateY(0);
-    }
-
-    .profile-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .profile-avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: white;
-    }
-
-    .profile-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      margin: 1.5rem 0;
-    }
-
-    .stat {
-      text-align: center;
-    }
-
-    .stat-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .stat-label {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 1.5rem;
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 50%;
-      transition: var(--transition);
-    }
-
-    .close-btn:hover {
-      background: var(--glass-highlight);
-    }
-  </style>
+<meta charset="UTF-8">
+<title>HectoClash Lobby</title>
+<style>
+body { font-family: Arial; text-align:center; margin-top:50px; }
+input, button { padding:10px; margin:5px; }
+#gameIdDisplay { margin-top:20px; font-weight:bold; }
+</style>
 </head>
 <body>
-  <div class="game-container glass">
-    <header class="game-header">
-      <h1 class="game-title">HECTOC</h1>
-      <button type="button" class="profile-btn" id="profile-btn">
-        <div class="avatar">P</div>
-        <span>Profile</span>
-      </button>
-    </header>
 
-    <main class="game-main">
-      <div class="puzzle-display">
-        <div class="digits" id="digits-container"></div>
-      </div>
+<h2>HectoClash Multiplayer Lobby</h2>
 
-      <div class="solution-container">
-        <input type="text" class="solution-input glass" placeholder="Enter your solution..." id="solution-input">
-      </div>
-      
-      <button type="button" class="submit-btn" id="submit-btn">SUBMIT SOLUTION</button>
-      <div class="feedback" id="feedback"></div>
-      <button type="button" class="submit-btn" id="giveup-btn" style="margin-top: 1rem; background: rgba(244, 67, 54, 0.8);">GIVE UP</button>
-    </main>
-  </div>
+<input type="text" id="playerName" placeholder="Enter your name" />
+<br>
+<button id="createBtn">Create Room</button>
+<br>
+<input type="text" id="joinGameId" placeholder="Enter Game ID to join" />
+<button id="joinBtn">Join Room</button>
 
-  <div class="profile-modal" id="profile-modal">
-    <div class="profile-content glass">
-      <button type="button" class="close-btn" id="close-btn">×</button>
-      <div class="profile-header">
-        <div class="profile-avatar">P</div>
-        <h2>Player Profile</h2>
-      </div>
-      <div class="profile-stats">
-        <div class="stat"><div class="stat-value">24</div><div class="stat-label">Puzzles Solved</div></div>
-        <div class="stat"><div class="stat-value">15</div><div class="stat-label">Current Streak</div></div>
-        <div class="stat"><div class="stat-value">86</div><div class="stat-label">Highest Score</div></div>
-      </div>
-      <h3>Recent Activity</h3>
-      <p style="color: var(--text-secondary); margin-top: 1rem;">Your game history will appear here...</p>
-    </div>
-  </div>
+<div id="gameIdDisplay"></div>
+
 <script>
-const digitsContainer = document.getElementById("digits-container");
-const solutionInput = document.getElementById("solution-input");
-const feedbackDiv = document.getElementById("feedback");
-const submitBtn = document.getElementById("submit-btn");
-const giveupBtn = document.getElementById("giveup-btn");
+const API = 'http://localhost:5000/api/game';
 
-let currentTarget = "";
+document.getElementById('createBtn').onclick = async () => {
+    const playerName = document.getElementById('playerName').value.trim();
+    if(!playerName) return alert('Enter your name');
 
-// Helper to display the digits
-function displayDigits(number) {
-  digitsContainer.innerHTML = "";
-  [...number].forEach(digit => {
-    const div = document.createElement("div");
-    div.className = "digit";
-    div.textContent = digit;
-    digitsContainer.appendChild(div);
-  });
-}
-
-async function loadPuzzle() {
-  try {
-    const res = await fetch("http://localhost:5000/api/game/random");
+    // Create room
+    const res = await fetch(`${API}/create`, { method:'POST' });
     const data = await res.json();
-    currentTarget = data.target;
-    displayDigits(currentTarget);
-    feedbackDiv.textContent = "";
-    feedbackDiv.className = "feedback";
-    solutionInput.value = "";
-  } catch (err) {
-    console.error("Error fetching puzzle:", err);
-    feedbackDiv.textContent = "Error loading puzzle.";
-    feedbackDiv.classList.add("visible");
-  }
-}
+    const gameId = data.gameId;
 
-// Call it right away
-loadPuzzle();
+    // Display Game ID to copy/share
+    document.getElementById('gameIdDisplay').textContent = `🎮 Room Created! Your Game ID: ${gameId}
+Share this ID with another player to join.`;
+};
 
-// === Submit Solution Handler ===
-submitBtn.addEventListener("click", async () => {
-  const solution = solutionInput.value.trim();
-  if (!solution) {
-    feedbackDiv.textContent = "Please enter a solution.";
-    feedbackDiv.className = "feedback visible incorrect";
-    return;
-  }
+document.getElementById('joinBtn').onclick = async () => {
+    const playerName = document.getElementById('playerName').value.trim();
+    const gameId = document.getElementById('joinGameId').value.trim();
+    if(!playerName || !gameId) return alert('Enter both fields');
 
-  try {
-    const res = await fetch("http://localhost:5000/api/game/check", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        target: currentTarget,
-        solution: solution
-      })
+    // Join the room
+    const res = await fetch(`${API}/join`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ gameId, playerName })
     });
     const data = await res.json();
-    if (data.verdict === "valid") {
-      feedbackDiv.textContent = "✅ Correct solution!";
-      feedbackDiv.className = "feedback visible correct";
-    } else {
-      feedbackDiv.textContent = "❌ Incorrect solution.";
-      feedbackDiv.className = "feedback visible incorrect";
-    }
-  } catch (err) {
-    console.error("Error submitting solution:", err);
-    feedbackDiv.textContent = "Error submitting solution.";
-    feedbackDiv.className = "feedback visible incorrect";
-  }
-});
+    if(data.error) return alert(data.error);
 
-// === Give Up Handler ===
-giveupBtn.addEventListener("click", async () => {
-  try {
-    const res = await fetch("http://localhost:5000/api/game/giveup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        target: currentTarget
-      })
-    });
-    const data = await res.json();
-    feedbackDiv.textContent = "🔍 Solution: " + data.solution;
-    feedbackDiv.className = "feedback visible";
-  } catch (err) {
-    console.error("Error fetching solution:", err);
-    feedbackDiv.textContent = "Error fetching solution.";
-    feedbackDiv.className = "feedback visible incorrect";
-  }
-});
-
+    // Redirect to game page
+    window.location.href = `gamepage2.html?gameId=${gameId}&playerName=${playerName}`;
+};
 </script>
 
 </body>

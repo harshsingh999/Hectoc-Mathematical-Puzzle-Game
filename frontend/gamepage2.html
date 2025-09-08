@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HectoClash Game</title>
+<style>
+body { font-family: Arial; text-align:center; margin-top:20px; }
+.player-box { display:inline-block; width:200px; margin:10px; padding:10px; border:1px solid #333; border-radius:5px; }
+input, button { padding:5px; margin:5px; }
+#messages { margin-top:10px; font-weight:bold; }
+</style>
+</head>
+<body>
+
+<h2>HectoClash Multiplayer Game</h2>
+<h3>Target Number: <span id="targetNumber">-</span></h3>
+
+<div id="playersContainer">
+    <div class="player-box" id="player1Box">Player 1: -<br>Verdict: -</div>
+    <div class="player-box" id="player2Box">Player 2: -<br>Verdict: -</div>
+</div>
+
+<input type="text" id="solutionInput" placeholder="Enter your solution" />
+<button id="moveBtn">Submit Move</button>
+<button id="giveupBtn">Give Up</button>
+
+<div id="messages"></div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+const API = 'http://localhost:5000/api/game';
+const socket = io('http://localhost:5000');
+
+const urlParams = new URLSearchParams(window.location.search);
+const gameId = urlParams.get('gameId');
+const playerName = urlParams.get('playerName');
+
+let targetNumber = '';
+let players = [];
+let gameFinished = false;
+
+const targetNumberSpan = document.getElementById('targetNumber');
+const messagesDiv = document.getElementById('messages');
+const player1Box = document.getElementById('player1Box');
+const player2Box = document.getElementById('player2Box');
+
+// --- Join room ---
+socket.emit('joinRoom', { roomCode: gameId, playerName });
+
+// --- Fetch game info ---
+async function fetchGame() {
+    const res = await fetch(`${API}/game-info?gameId=${gameId}`);
+    const data = await res.json();
+    if(data.error) return alert(data.error);
+
+    targetNumber = data.target;
+    targetNumberSpan.textContent = targetNumber;
+    players = data.players;
+    updatePlayerBoxes();
+}
+fetchGame();
+
+// --- Submit move ---
+document.getElementById('moveBtn').onclick = async () => {
+    if(gameFinished) return;
+    const solution = document.getElementById('solutionInput').value.trim();
+    if(!solution) return alert('Enter solution');
+
+    const res = await fetch(`${API}/move`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ gameId, playerName, solution })
+    });
+    const data = await res.json();
+    if(data.error) return alert(data.error);
+
+    updatePlayerVerdict(playerName, data.verdict);
+
+    if(data.gameFinished && data.winner) {
+        gameFinished = true;
+        messagesDiv.innerHTML = `🎉 Winner: ${data.winner}`;
+    }
+};
+
+// --- Give up ---
+document.getElementById('giveupBtn').onclick = async () => {
+    if(gameFinished) return;
+
+    const res = await fetch(`${API}/giveup-multi`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ gameId, playerName })
+    });
+    const data = await res.json();
+
+    gameFinished = true;
+    messagesDiv.innerHTML = `💀 You gave up! Solution: ${data.solution || '-'} ${data.winner ? data.winner + ' wins!' : ''}`;
+};
+
+// --- Socket events ---
+socket.on('roomUpdate', (updatedPlayers) => {
+    // backend sends array of player names
+    players = updatedPlayers;
+    updatePlayerBoxes();
+});
+
+socket.on('playerMove', ({ playerName, verdict, gameFinished: finished, winner }) => {
+    updatePlayerVerdict(playerName, verdict);
+    if(finished && winner) {
+        gameFinished = true;
+        messagesDiv.innerHTML = `🎉 Winner: ${winner}`;
+    }
+});
+
+socket.on('playerGiveup', ({ quitter, solution, winner }) => {
+    gameFinished = true;
+    messagesDiv.innerHTML = `💀 ${quitter} gave up! ${solution ? "Solution: " + solution : ""} ${winner ? winner + ' wins!' : ''}`;
+});
+
+// --- Helpers ---
+function updatePlayerBoxes() {
+    player1Box.innerHTML = `Player 1: ${players[0] || '-'}<br>Verdict: -`;
+    player2Box.innerHTML = `Player 2: ${players[1] || '-'}<br>Verdict: -`;
+}
+
+function updatePlayerVerdict(player, verdict) {
+    if(players[0] === player) player1Box.innerHTML = `Player 1: ${player}<br>Verdict: ${verdict}`;
+    if(players[1] === player) player2Box.innerHTML = `Player 2: ${player}<br>Verdict: ${verdict}`;
+}
+</script>
+
+</body>
+</html>
